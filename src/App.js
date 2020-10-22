@@ -49,14 +49,13 @@ export default class App extends React.Component {
         new Node(9, 200, 200, "gray"),
         new Node(10, 200, 300, "gray"),
         new Node(11, 200, 400, "gray"),
-        new Node(12, 200, 400, "gray"),
-        new Node(13, 300, 0, "gray"),
-        new Node(14, 300, 400, "gray"),
-        new Node(15, 400, 0, "gray"),
-        new Node(16, 400, 100, "red"),
-        new Node(17, 400, 200, "gray"),
-        new Node(18, 400, 300, "gray"),
-        new Node(19, 400, 400, "gray"),
+        new Node(12, 300, 0, "gray"),
+        new Node(13, 300, 400, "gray"),
+        new Node(14, 400, 0, "gray"),
+        new Node(15, 400, 100, "red"),
+        new Node(16, 400, 200, "gray"),
+        new Node(17, 400, 300, "gray"),
+        new Node(18, 400, 400, "gray"),
       ],
       [
         new Route(0, 1),
@@ -69,16 +68,16 @@ export default class App extends React.Component {
         new Route(6, 11),
         new Route(9, 8),
         new Route(9, 10),
-        new Route(11, 10),
+        new Route(10, 11),
         new Route(8, 7),
-        new Route(7, 13),
-        new Route(13, 15),
-        new Route(15, 16),
+        new Route(7, 12),
         new Route(12, 14),
-        new Route(14, 19),
-        new Route(19, 18),
+        new Route(14, 15),
+        new Route(11, 13),
+        new Route(13, 18),
         new Route(18, 17),
         new Route(17, 16),
+        new Route(16, 15),
 
       ]
     )
@@ -86,9 +85,13 @@ export default class App extends React.Component {
       graphe: this.graphe
     }
     this.fin = undefined;
+    this.fileDeNodes = [];
   }
 
   componentDidMount() {
+    this.fileDeNodes.push(this.state.graphe.nodes[0])// parce que cest le premier 
+    this.state.graphe.nodes[0].verifier = true;
+    this.fin = 15;
     this.timerID = setInterval(
       () => this.tick(),
       1000
@@ -96,30 +99,49 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.timerID);  
+    clearInterval(this.timerID);
   }
 
   tick() {
-    this.graphe.nodes[1].color = "green";
-    this.setState(prevState =>({
-      graphe : prevState.graphe.map(node=>
-        node.id === 1 
-        ?{...node, color:"green"}
-        :node
-      )
-    }));
     
-  }
-  render() {
-    return (
-      <div>
-        <Graph
-          key={uuidv4()}
-          graph={this.state.graphe}
-          options={options}
-        />
-      </div>
-    );  
-  }
-} 
+    if (this.fileDeNodes.length !== 0 && this.state.graphe.nodes[this.fin].verifier !== true) {
+      
+      let noeud = this.fileDeNodes.shift();
+     
+      let edgeNoeud = this.state.graphe.edges.filter(edge => (edge.to === noeud.id || edge.from === noeud.id));
 
+      edgeNoeud.forEach(edge => {
+        if(edge.to !== noeud.id && this.graphe.nodes[edge.to].verifier !== true){
+          this.graphe.nodes[edge.to].verifier = true
+          this.fileDeNodes.push(this.state.graphe.nodes[edge.to]);
+        }else if(this.graphe.nodes[edge.from].verifier !== true){
+          this.graphe.nodes[edge.from].verifier = true
+          this.fileDeNodes.push(this.state.graphe.nodes[edge.from]);
+        }
+      });
+      if(noeud.id !== 0){
+        this.setState(prevState => ({
+          graphe: {
+            ...prevState.graphe, nodes: prevState.graphe.nodes.map(node =>
+              node.id === noeud.id
+                  ? { ...node, color: "blue" }
+                : node
+            )
+          }
+        })); 
+      }    
+  }
+}
+render() {
+  return (
+    <div>
+      <Graph
+        key={uuidv4()}
+        graph={this.state.graphe}
+        options={options}
+      />
+    </div>
+  );
+}
+
+}

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 
 /**
  * 1632228 - Luke-Anthony Gauthier
@@ -18,7 +19,7 @@ export default class Graphe{
      * @returns null
      */  
   constructor(nodes , routes) {
-    this.nodes =  nodes;
-    this.edges = routes;  
+    this.nodes = _.cloneDeep(nodes);
+    this.edges = _.cloneDeep(routes);
   }
 }

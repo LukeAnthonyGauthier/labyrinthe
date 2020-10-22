@@ -1,3 +1,4 @@
+
 /**
  * 1632228 - Luke-Anthony Gauthier
  * 
@@ -14,12 +15,11 @@ export default class Node{
      * @param id est l'identifiant de la node 
      * @returns null
     */ 
-    constructor(id, x ,y, color) {
+    constructor(id,x,y,color) {
       this.id = id;
-      this.x = x;
-      this.y = y; 
-      this.color = color;
-      
+      this.x = x
+      this.y = y;
+      this.color = color
+      this.verifier = false;
     }
-
 }
