@@ -16,8 +16,8 @@ const options = {
     randomSeed: 0,
   },
   interaction: {
-    dragNodes: true,
-    dragView: true,
+    dragNodes: false,
+    dragView: false,
   },
   physics: {
     enabled: false,
@@ -31,12 +31,11 @@ const options = {
   height: "500px",
 
 };
-const events = {};
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.graph = new GraphAfficher(
+    this.graphe = new GraphAfficher(
       [
         new Node(0, 0, 0, "green"),
         new Node(1, 0, 100, "gray"),
@@ -66,7 +65,6 @@ export default class App extends React.Component {
         new Route(3, 4),
         new Route(2, 5),
         new Route(4, 6),
-        new Route(4, 6),
         new Route(5, 9),
         new Route(6, 11),
         new Route(9, 8),
@@ -85,9 +83,9 @@ export default class App extends React.Component {
       ]
     )
     this.state = {
-      graph: this.graph
-
+      graphe: this.graphe
     }
+    this.fin = undefined;
   }
 
   componentDidMount() {
@@ -102,7 +100,14 @@ export default class App extends React.Component {
   }
 
   tick() {
-    
+    this.graphe.nodes[1].color = "green";
+    this.setState(prevState =>({
+      graphe : prevState.graphe.map(node=>
+        node.id === 1 
+        ?{...node, color:"green"}
+        :node
+      )
+    }));
     
   }
   render() {
@@ -110,12 +115,8 @@ export default class App extends React.Component {
       <div>
         <Graph
           key={uuidv4()}
-          graph={this.state.graph}
+          graph={this.state.graphe}
           options={options}
-          events={events}
-          getNetwork={(network) => {
-            //  if you want access to vis.js network api you can set the state in a parent component using this property
-          }}
         />
       </div>
     );  
