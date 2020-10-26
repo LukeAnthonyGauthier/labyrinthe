@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import GraphAfficher from "./class/graph";
 import Route from "./class/route";
 import Node from "./class/node";
-let timer = 0;
+
 
 const options = {
   nodes: {
@@ -88,58 +88,60 @@ export default class App extends React.Component {
     this.pileDeNodes = [];
   }
 
-  parcourirGraph() {
-
-    this.noeudVisiter(this.graphe.nodes[0]) // parce que cest le premier  
-
-  }
-  noeudVisiter(noeud) {
-    if (noeud.id != 15) {
-      timer += 1000;
-
-      noeud.verifier = true;
-
-      setTimeout(() => {
-        if (noeud.id !== 0) {
-
-          this.setState(prevState => ({
-            graphe: {
-              ...prevState.graphe, nodes: prevState.graphe.nodes.map(node =>
-                node.id === noeud.id
-                  ? { ...node, color: "blue" }
-                  : node
-              )
-            }
-          }));
-        }
-      }, timer);
-      this.verifierEdges(noeud);
-    }
-
-  }
-  verifierEdges(noeud) {
-    let edgeNoeud = this.state.graphe.edges.filter(edge => (edge.to === noeud.id || edge.from === noeud.id));
-
-    edgeNoeud.forEach(edge => {
-      if (edge.to !== noeud.id && this.graphe.nodes[edge.to].verifier !== true) {
-        this.noeudVisiter(this.state.graphe.nodes[edge.to]);
-      } else if (this.graphe.nodes[edge.from].verifier !== true) {
-        this.noeudVisiter(this.state.graphe.nodes[edge.from]);
-      }
-    });
-
-  }
-  render() {
-    this.parcourirGraph();
-    return (
-      <div>
-        <Graph
-          key={uuidv4()}
-          graph={this.state.graphe}
-          options={options}
-        />
-      </div>
+  componentDidMount() {
+    this.pileDeNodes.push(this.state.graphe.nodes[0])// parce que cest le premier 
+    this.state.graphe.nodes[0].verifier = true;
+    this.fin = 15;
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
     );
   }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+    
+    if (this.pileDeNodes.length !== 0 && this.state.graphe.nodes[this.fin].verifier !== true) {
+      
+      let noeud = this.pileDeNodes.pop();
+     
+      let edgeNoeud = this.state.graphe.edges.filter(edge => (edge.to === noeud.id || edge.from === noeud.id));
+
+      edgeNoeud.forEach(edge => {
+        if(edge.to !== noeud.id && this.graphe.nodes[edge.to].verifier !== true){
+          this.graphe.nodes[edge.to].verifier = true
+          this.pileDeNodes.push(this.state.graphe.nodes[edge.to]);
+        }else if(this.graphe.nodes[edge.from].verifier !== true){
+          this.graphe.nodes[edge.from].verifier = true
+          this.pileDeNodes.push(this.state.graphe.nodes[edge.from]);
+        }
+      });
+      if(noeud.id !== 0){
+        this.setState(prevState => ({
+          graphe: {
+            ...prevState.graphe, nodes: prevState.graphe.nodes.map(node =>
+              node.id === noeud.id
+                  ? { ...node, color: "blue" }
+                : node
+            )
+          }
+        })); 
+      }    
+  }
+}
+render() {
+  return (
+    <div>
+      <Graph
+        key={uuidv4()}
+        graph={this.state.graphe}
+        options={options}
+      />
+    </div>
+  );
+}
 
 }
