@@ -31,7 +31,7 @@ const options = {
   height: "500px",
 
 };
-let timer = 0;
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -86,16 +86,15 @@ export default class App extends React.Component {
     }
 
   }
-  //Appelle des fonciton nessaicre pour Dijkstra
   componentDidMount() {
     this.graphe.nodes[0].verifier = true;
     this.parcourirDijkstra(this.graphe.nodes[0], this.graphe.nodes[15]);
   }
-  //Regroupement des differentes êtapes pour faire fonctionner l'ago
+
   parcourirDijkstra(noeudDepart, noeudFin) {
-    //fait la liste de départ
+
     this.tableauDesChemins = this.creationTableauDistance(noeudDepart)
-    //crée la queue
+
     let queue = this.creationQueue(noeudDepart);
 
     // pendant que la queue est encore pleine
@@ -103,14 +102,13 @@ export default class App extends React.Component {
       let noeud = queue.deq();
       noeud.verifier = true;
 
-      //trouve les voisin non vérifier et les met dans la queue
+
       let edgeNoeud = this.state.graphe.edges.filter(edge => (edge.to === noeud.id || edge.from === noeud.id));
 
       edgeNoeud.forEach(edge => {
         if (edge.to !== noeud.id && this.graphe.nodes[edge.to].verifier !== true) {
           let prochainNodeID = edge.to;
           let nouvelleDistance = this.tableauDesChemins[noeud.id].distance + edge.poid;
-          // modifie les valeurs si le chemin est plus court
           if (this.compareDistance(prochainNodeID, nouvelleDistance, noeud)) {
             queue.enq(this.graphe.nodes[prochainNodeID]);
           }
@@ -118,20 +116,17 @@ export default class App extends React.Component {
         } else if (this.graphe.nodes[edge.from].verifier !== true) {
           let prochainNodeID = edge.from;
           let nouvelleDistance = this.tableauDesChemins[noeud.id].distance + edge.poid;
-           // modifie les valeurs si le chemin est plus court
           if (this.compareDistance(prochainNodeID, nouvelleDistance, noeud)) {
             queue.enq(this.graphe.nodes[prochainNodeID]);
           }
         }
       });
     }
-    // varible avec les chemin final 
     let cheminFinal = this.faireLeChemin(noeudFin);
-    //gères le changement de couleur a bleu 
+
     this.afficherLeChemin(cheminFinal);
 
   }
-  // la function qui fait le tableau de distance
   creationTableauDistance(noeudDepart) {
     return this.graphe.nodes.map(node => {
       if (node.id === noeudDepart.id) {
@@ -148,7 +143,7 @@ export default class App extends React.Component {
       }
     });
   }
-  // functiom pour la création de la queue
+
   creationQueue(noeudDepart) {
     let queue = new PriorityQueue((a, b) => {
       return b.priorite - a.priorite;
@@ -157,7 +152,7 @@ export default class App extends React.Component {
     queue.enq(noeudDepart);
     return queue;
   }
-  // funtion qui regarde les distance des noeuds et les modifie au besoin
+
   compareDistance(prochainNodeID, nouvelleDistance, noeud) {
     if (this.tableauDesChemins[prochainNodeID].distance >= nouvelleDistance) {
       this.tableauDesChemins[prochainNodeID].distance = nouvelleDistance;
@@ -167,7 +162,6 @@ export default class App extends React.Component {
     }
     return false;
   }
-  //function qui trie et met les bon chemin dans une pile
   faireLeChemin(noeudFin) {
     let pile = [];
  
@@ -185,12 +179,10 @@ export default class App extends React.Component {
    
     return pile;
   }
-  //function qui fait le changment de couleur des noeuds dans la pile cheminFinal
   afficherLeChemin(pileDuChemin) {
     while(pileDuChemin.length > 0){
       let noeud = pileDuChemin.pop();
       if (noeud.id != 15) {
-        //le temps entre chaque changement de couleur 
         timer += 500;
 
         noeud.verifier = true;
@@ -214,7 +206,7 @@ export default class App extends React.Component {
     }
   }
 
-  // affiche le graphe et ses changements 
+
   render() {
     
     return (
